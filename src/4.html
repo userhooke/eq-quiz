@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css" />
+    <link rel="stylesheet" href="/style.css" />
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <title>Фильтры настроения: узнайте, как вы смотрите на различные ситуации.</title>
+  </head>
+  <body>
+    <main>
+      <a href="/">Назад к списку тестов</a>
+      <p>Фильтры настроения: узнайте, как вы смотрите на различные ситуации.</p>
+      <div x-data="quiz">
+        <div x-show="!showResult">
+          <b><p x-text="active.question"></p></b>
+          <button @click="active.key && groups[groupPos].score++; questionPos++">Да</button>
+          <button @click="!active.key && groups[groupPos].score++; questionPos++">Нет</button>
+        </div>
+
+        <div x-cloak x-show="showResult">
+          <h2>Результат</h2>
+          <ul>
+            <template x-for="group in groups">
+              <li><b x-text="group.name"></b>: <span x-text="calculateResult(group)"></span></li>
+            </template>
+          </ul>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      document.addEventListener("alpine:init", () => {
+        Alpine.data("quiz", () => ({
+          showResult: false,
+          groupPos: 0,
+          questionPos: 0,
+          calculateResult(group) {
+            return group.score < 5 ? group.lowScoreAnswer : group.highScoreAnswer;
+          },
+          get active() {
+            if (this.questionPos === this.groups[this.groupPos].questions.length) {
+              this.groupPos++;
+              this.questionPos = 0;
+            }
+            if (this.groupPos === this.groups.length) {
+              this.groupPos = 0;
+              this.showResult = true;
+            }
+            return {
+              question: this.groups[this.groupPos].questions[this.questionPos][0],
+              key: this.groups[this.groupPos].questions[this.questionPos][1],
+            };
+          },
+          groups: [
+            {
+              name: "Беспокойство",
+              questions: [
+                ["У меня в голове много мыслей.", true],
+                ["Я часто напряжен или раздражен.", true],
+                ["По большей части я спокоен и расслаблен.", false],
+                ["Я беспокоюсь о многих вещах.", true],
+                ["Я часто нервничаю.", true],
+                ["Я не испытываю беспокойства.", false],
+              ],
+              score: 0,
+              lowScoreAnswer: "Можете сдерживать беспокойство и тревожность.",
+              highScoreAnswer: "Предельно вигильный, фокусируется на тревогах.",
+            },
+            {
+              name: "Подавленность",
+              questions: [
+                ["Иногда я грущу или чувствую себя подавленным.", true],
+                ["Я часто випадаю в уныние.", true],
+                ["Грустить или пребывать в депрессии мне не свойственно.", false],
+                ["Временами я чувствую себя очень плохо.", true],
+                ["Иногда я бываю в дурном настроении.", true],
+                ["Как правило, я бодри пребываю в хорошем настроении.", false],
+              ],
+              score: 0,
+              lowScoreAnswer: "Редко испытываете печаль.",
+              highScoreAnswer: "Фокусируется на грусти.",
+            },
+            {
+              name: "Гнев",
+              questions: [
+                ["Некоторые люди меня раздражают.", true],
+                ["Я нетерпелив.", true],
+                ["Меня легко расстроить.", true],
+                ["Я принимаю людей такими, какие они есть.", false],
+                ["Я часто злюсь или огорчаюсь.", true],
+                ["Меня непросто разозлить.", true],
+              ],
+              score: 0,
+              lowScoreAnswer: "Принимаете других людей: стараетесь не замечать нечестности.",
+              highScoreAnswer: "Замечает несправедливость и нечестность.",
+            },
+            {
+              name: "Приятность",
+              questions: [
+                ["Со мной легко найти общий язык.", true],
+                ["Я легко схожусь с людьми.", true],
+                ["Во мне силен дух состязания.", false],
+                ["Я не командный игрок.", false],
+                ["Я не бесцеремонный человек.", true],
+                ["Я разделяю заслуги с другими людьми.", true],
+              ],
+              score: 0,
+              lowScoreAnswer: "Состязательный дух: склонен к придирчивости.",
+              highScoreAnswer: "Избегает конфликтовать с окружающими.",
+            },
+            {
+              name: "Оптимизм",
+              questions: [
+                ["Я считаю, что добьюсь успеха.", true],
+                ["Я обычно смотрю на вещи позитивно.", true],
+                ["Мои ожидания в отношении себя самого невысоки.", false],
+                ["Обычно все происходит к лучшему.", true],
+                ["В жизни приходится преодолевать слишком много препятствий.", false],
+                ["Я во всем стараюсь находить хорошее.", true],
+              ],
+              score: 0,
+              lowScoreAnswer: "Открыт негативным эмоциям.",
+              highScoreAnswer: "Фокусируется на позитивных эмоциях.",
+            },
+            {
+              name: "Доверие",
+              questions: [
+                ["Обычно я людям доверяю.", true],
+                ["Я верю людям на слово.", true],
+                ["Люди, как правило, заслуживают доверия.", true],
+                ["Доверять людям — не лучшая стратегия", false],
+                ["Большинство людей — честные.", true],
+                ["Люди воспользуются твоей доверчивостью, если не быть бдительным.", false],
+              ],
+              score: 0,
+              lowScoreAnswer: "Способен увидеть недостатки других людей; склонен к проявлению негативных эмоций.",
+              highScoreAnswer: "Считает людей хорошими и меньше склонен к проявлению негативных эмоций.",
+            },
+            {
+              name: "Стресс",
+              questions: [
+                ["Я хорошо справляюсь со стрессом.", false],
+                ["В состоянии сильного стресса я чувствую себя абсолютно разбитым.", true],
+                ["Временами жизнь выбивает меня из колеи.", true],
+                ["Иногда я испытываю серьезные перегрузки.", true],
+                ["Я отлично справляюсь со стрессом.", false],
+                ["Временами я совершенно подавлен.", true],
+              ],
+              score: 0,
+              lowScoreAnswer: "Открыт для стрессовых ситуаций.",
+              highScoreAnswer: "Сдерживается в эмоциональных ситуациях.",
+            },
+          ],
+        }));
+      });
+    </script>
+  </body>
+</html>
